@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.19.2",
     "deepmerge": "^4.2.2",
-    "inquirer": "^7.1.0"
+    "inquirer": "^7.1.0",
+    "query-string": "^6.12.1"
   }
 }
