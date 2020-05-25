@@ -1,3 +1,5 @@
+const shutstrap = require("./straps/shutstrap.js");
+
 // Bootstrap the application
 (async () => {
   const bootstrap = require("./straps/bootstrap.js");
@@ -16,9 +18,12 @@
       connection(async (result) => {
         if (checkTimes < 1 && result.onGround > 0) {
           logger.error("Start the client only when in air! Quitting.");
+          shutstrap();
           clearInterval(simInterval);
         } else {
-          ClientService.connect();
+          if (checkTimes < 2) {
+            ClientService.connect();
+          }
           if (result.onGround > 0) {
             landingRate = result.vSpeed;
 
@@ -27,6 +32,7 @@
 
             await LandingReporterService.report(landingRate);
             clearInterval(simInterval);
+            shutstrap();
           }
         }
         checkTimes++;
@@ -34,3 +40,20 @@
     }, 200);
   });
 })();
+
+process.on("exit", function () {
+  shutstrap();
+});
+
+// catch ctrl+c event and exit normally
+process.on("SIGINT", function () {
+  shutstrap();
+  process.exit(2);
+});
+
+//catch uncaught exceptions, trace, then exit normally
+process.on("uncaughtException", function (e) {
+  shutstrap();
+  console.log(e.stack);
+  process.exit(99);
+});

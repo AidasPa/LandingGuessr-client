@@ -14,6 +14,17 @@ class ClientService {
       }
     );
   }
+  async disconnect() {
+    axios.post(
+      config.endpoint + "/client/disconnect",
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + (await store.get()).auth.token,
+        },
+      }
+    );
+  }
 }
 
 module.exports = new ClientService();
