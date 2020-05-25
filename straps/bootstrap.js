@@ -48,9 +48,7 @@ module.exports = async (callback) => {
         }
       });
   } else {
-      
     if (await AuthService.getToken(storeObj.auth.email, storeObj.auth.password)) {
-        
       callback();
     } else {
       return;

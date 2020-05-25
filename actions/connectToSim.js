@@ -2,23 +2,20 @@ const fsuipc = require("fsuipc");
 const logger = require("../services/logger.js");
 const obj = new fsuipc.FSUIPC();
 
-module.exports = function () {
+module.exports = function (callback) {
   obj
     .open()
     .then((obj) => {
-      console.log(obj.add("clockHour", 0x238, fsuipc.Type.Byte));
-      console.log(obj.add("aircraftType", 0x3d00, fsuipc.Type.String, 256));
-      console.log(obj.add("lights", 0x0d0c, fsuipc.Type.BitArray, 2));
-
+      obj.add("onGround", 0x0366, fsuipc.Type.Int16);
+      obj.add("vSpeed", 0x030c, fsuipc.Type.Int32);
       return obj.process();
     })
     .then((result) => {
-      console.log(JSON.stringify(result));
-
+      callback(result);
       return obj.close();
     })
     .catch((err) => {
-      logger.error(err);
+      //   logger.error(err);
       return obj.close();
     });
 };
