@@ -32,10 +32,10 @@ const shutstrap = require("./straps/shutstrap.js");
 
             await LandingReporterService.report(landingRate);
             clearInterval(simInterval);
+            shutstrap();
             logger.info("App quiting in 15 seconds...");
             setTimeout(() => {
               logger.info("bye bye!");
-              shutstrap();
             }, 15000);
           }
         }
