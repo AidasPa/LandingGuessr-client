@@ -35,6 +35,7 @@ module.exports = async (callback) => {
               token: data.data.access_token,
             },
           });
+          logger.info("Token: " + data.data.access_token);
           callback();
         } catch (error) {
           console.log("Unable to login!");
