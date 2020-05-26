@@ -1,3 +1,3 @@
 module.exports = {
-  endpoint: "http://localhost:8000/api",
+  endpoint: "http://67.207.75.148/api",
 };

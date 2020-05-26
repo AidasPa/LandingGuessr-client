@@ -19,7 +19,7 @@ class AuthService {
         }
       );
     } catch (err) {
-      return false;
+      console.log(err)
     }
     return data;
   }
