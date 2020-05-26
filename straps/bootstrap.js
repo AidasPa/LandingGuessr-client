@@ -1,6 +1,8 @@
 const store = require("../services/store.js");
 const AuthService = require("../services/AuthService.js");
 
+const logger = require("../services/logger.js");
+
 module.exports = async (callback) => {
   const storeObj = await store.get();
   if (storeObj.auth === undefined) {
