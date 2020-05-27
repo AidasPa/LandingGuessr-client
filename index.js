@@ -3,26 +3,57 @@ const shutstrap = require("./straps/shutstrap.js");
 // Bootstrap the application
 (async () => {
   const bootstrap = require("./straps/bootstrap.js");
-  // do a callback function once done bootstrap completes
+  // do a callback function once bootstrap completes
   bootstrap(function () {
     const logger = require("./services/logger.js");
     logger.success("Application bootstrapped!");
+
     const connection = require("./actions/connectToSim.js");
     const LandingReporterService = require("./services/LandingReporterService.js");
     const ClientService = require("./services/ClientService.js");
+    const AuthService = require("./services/AuthService.js");
+
+    async function refreshUserToken() {
+      const store = require("./services/store.js");
+
+      const currentToken = await store.get();
+      try {
+        const data = await AuthService.refreshToken(currentToken.auth.token);
+        store.set({
+          auth: {
+            token: data.data.access_token,
+          },
+        });
+        logger.debug("Token refreshed successfully!");
+      } catch (error) {
+        logger.error(
+          "Something went horribly wrong while trying to authenticate the user!"
+        );
+        console.log(error);
+      }
+    }
+
+    refreshUserToken();
+    const authInterval = setInterval(() => {
+      refreshUserToken();
+      // every 59 minutes (60 - 1 to be sure)
+    }, 59 * 60000);
 
     let landingRate;
     let checkTimes = 0;
 
+    logger.info("Attempting connection to simulator (every 200ms)");
     const simInterval = setInterval(() => {
       connection(async (result) => {
         if (checkTimes < 1 && result.onGround > 0) {
           logger.error("Start the client only when in air! Quitting.");
           shutstrap();
           clearInterval(simInterval);
+          clearInterval(authInterval);
         } else {
           if (checkTimes < 2) {
             ClientService.connect();
+            logger.success("Connected to simulator!");
           }
           if (result.onGround > 0) {
             landingRate = result.vSpeed;
@@ -32,8 +63,10 @@ const shutstrap = require("./straps/shutstrap.js");
 
             await LandingReporterService.report(landingRate);
             clearInterval(simInterval);
+            clearInterval(authInterval);
+
             shutstrap();
-            logger.info("App quiting in 15 seconds...");
+            logger.info("App quitting in 15 seconds...");
             setTimeout(() => {
               logger.info("bye bye!");
             }, 15000);

@@ -3,6 +3,13 @@ const config = require("../LGSconf.js");
 const queryString = require("query-string");
 
 class AuthService {
+  async refreshToken(token) {
+    return await axios.post(config.endpoint + '/auth/refresh', {}, {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+  }
   async getToken(email, password) {
     let data;
     try {

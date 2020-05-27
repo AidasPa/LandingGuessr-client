@@ -37,7 +37,6 @@ module.exports = async (callback) => {
               token: data.data.access_token,
             },
           });
-          logger.info("Token: " + data.data.access_token);
           callback();
         } catch (error) {
           console.log("Unable to login!");
@@ -51,9 +50,19 @@ module.exports = async (callback) => {
         }
       });
   } else {
-    if (await AuthService.getToken(storeObj.auth.email, storeObj.auth.password)) {
+    const data = await AuthService.getToken(
+      storeObj.auth.email,
+      storeObj.auth.password
+    );
+    if (data) {
+      store.set({
+        auth: {
+          token: data.data.access_token,
+        },
+      });
       callback();
     } else {
+      logger.error("Something went wrong while bootstrapping...");
       return;
     }
   }
